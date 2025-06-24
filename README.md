@@ -1,4 +1,4 @@
-# High-Performance Keccak-256 AVX2 Implementation
+# C/C++ GHigh-Performance Keccak-256 AVX2 Implementation
 
 This is a Keccak-256 hash function library written in C, specifically designed for achieving extreme computational speed. It has been deeply optimized by leveraging the AVX2 instruction set found in modern CPUs.
 
