@@ -38,7 +38,7 @@ static void init_test_vectors() {
     inlens[1] = 3;
 
     // 200 * 0xA3
-    inputs[2] = malloc(200);
+    inputs[2] = (unsigned char*)malloc(200); 
     memset(inputs[2], 0xA3, 200);
     inlens[2] = 200;
 }
@@ -58,7 +58,7 @@ static void test_single(const char *name, void (*fn)(const unsigned char*, size_
     }
     // throughput
     size_t msglen = 1024*1024; // 1MB
-    unsigned char *bigmsg = malloc(msglen);
+    unsigned char *bigmsg = (unsigned char*)malloc(msglen); 
     memset(bigmsg, 0xA5, msglen);
     clock_t t0 = clock();
     for (int i = 0; i < 50; i++) fn(bigmsg, msglen, out);
@@ -91,7 +91,7 @@ static void test_8x(const char *name, void (*fn)(const unsigned char**, const si
     }
     // throughput
     size_t msglen = 1024*1024;
-    unsigned char *bigmsg = malloc(msglen);
+    unsigned char *bigmsg = (unsigned char*)malloc(msglen); 
     memset(bigmsg, 0xA5, msglen);
     for (int i = 0; i < 8; i++) { in8[i] = bigmsg; lens8[i] = msglen; out8[i] = outs[i]; }
     clock_t t0 = clock();
@@ -121,4 +121,3 @@ int main() {
     free_test_vectors();
     return 0;
 }
-
