@@ -1,6 +1,6 @@
-# C/C++ High-performance sha3 224 256 384 512 and Keccak-256 AVX2 implementations
+# C/C++ High-performance sha3,224,256,384,512,Keccak-256,md5 AVX2 implementations
 
-This is a sha3 224 256 384 512 and Keccak-256 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
+This is a sha3,224,256,384,512,Keccak-256,md5 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
 
 ## Core Advantages
 
@@ -13,7 +13,8 @@ This is a sha3 224 256 384 512 and Keccak-256 hashing library written in C (comp
 
 * Applications requiring extremely fast SHA3 224, 256, 384, 512, and Keccak-256 hash calculation speeds.
 * Scenarios requiring efficient processing of large numbers of parallel hashing tasks, such as blockchain technology, data verification, and high-performance computing.
-* SHA3 224, 256, 384, and 512 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
+* SHA3 224,256,384,512 and md5 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
+
 ## Compilation
 
 ```
@@ -22,9 +23,15 @@ gcc -O3 -mavx2 -mfma -march=native sha3_avx2.c sha3_avx2_test.c -o sha3_avx2_tes
 
 gcc -O3 -mavx2 -mfma -march=native keccak_avx_test.c keccak256_avx.c -o keccak_avx_test
 
+gcc -o md5_avx2_test md5_test_avx2.c md5_avx2.c -O3 -march=native -Wall -mavx2 -flto -fno-trapping-math -fno-math-errno
+```
 
 Testing and Verification
 
+Based on Intel® Xeon® E5-2697 v4 2.30 GHz single-threaded environment
+
+*****************************************************************************************************************************
+```
 ./sha3_avx2_test
 ==== Single SHA3 ====
 SHA3-224 correctness:
@@ -75,8 +82,10 @@ SHA3-512 8x correctness:
   abc          : OK
   200 x 0xA3   : OK
   throughput: 381.07 MB/s (8 msgs)
+```
+*****************************************************************************************************************************
 
-
+```
 ./keccak_avx_test
 Calculating Keccak256 of "abc" for all 8 lanes:
 Expected Keccak256("abc"): 4e03657aea45a94fc7d47ba826c8d667c0d1e6e33a64a036ec44f58fa12d6c45
@@ -104,6 +113,38 @@ Data processing rate:              614.60 MB/s
 ======================================
 Sample hash from benchmark (Lane 0) after 2962000 operations:
 Lane 0: ac0fee99c81a5afe757cd8b1e962a3fe866b29dfbfec586d97feaaf964a202a9
+```
+
+*****************************************************************************************************************************
+
+```
+./md5_avx2_test
+
+=== MD5 AVX2 High-Performance Benchmark ===
+Configuration: 8 independent data streams, each 128.00 MB
+Total data size: 1024.00 MB
+Number of test iterations: 5
+
+Initializing data streams...Done
+
+Performing warm-up run...Done
+
+=== Scalar Benchmark ===
+Average time: 1.9990 seconds
+Average throughput: 512.27 MB/s
+Throughput per iteration: [512.14, 512.29, 512.24, 512.34, 512.32] MB/s
+
+=== AVX2 Batch Processing Benchmark ===
+Average time: 0.5715 seconds
+Average throughput: 1791.77 MB/s
+Throughput per iteration: [1791.57, 1791.66, 1792.10, 1790.99, 1792.55] MB/s
+
+=== Verification and Comparison ===
+✓ Verification successful! All 8 digests match
+Speedup: 3.50x
+
+Benchmark finished
+
 ```
 
 
