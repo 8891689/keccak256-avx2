@@ -1,6 +1,6 @@
-# C/C++ High-performance sha3,224,256,384,512,Keccak-256,md5 AVX2 implementations
+# C/C++ High-performance sha3,224,256,384,512,Keccak-256,md5,sha1 AVX2 implementations
 
-This is a sha3,224,256,384,512,Keccak-256,md5 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
+This is a sha3,224,256,384,512,Keccak-256,md5,sha1 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
 
 ## Core Advantages
 
@@ -11,9 +11,9 @@ This is a sha3,224,256,384,512,Keccak-256,md5 hashing library written in C (comp
 
 ## Applicable Scenarios
 
-* Applications requiring extremely fast SHA3 224, 256, 384, 512, and Keccak-256 hash calculation speeds.
+* Applications requiring extremely fast SHA3 224, 256, 384, 512, and Keccak-256,md5,sha1 hash calculation speeds.
 * Scenarios requiring efficient processing of large numbers of parallel hashing tasks, such as blockchain technology, data verification, and high-performance computing.
-* SHA3 224,256,384,512 and md5 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
+* SHA3 224,256,384,512 and md5,sha1 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
 
 ## Compilation
 
@@ -24,6 +24,9 @@ gcc -O3 -mavx2 -mfma -march=native sha3_avx2.c sha3_avx2_test.c -o sha3_avx2_tes
 gcc -O3 -mavx2 -mfma -march=native keccak_avx_test.c keccak256_avx.c -o keccak_avx_test
 
 gcc -o md5_avx2_test md5_test_avx2.c md5_avx2.c -O3 -march=native -Wall -mavx2 -flto -fno-trapping-math -fno-math-errno
+
+gcc -o sha1_avx2_test sha1_test_avx2.c sha1_avx2.c -O3 -march=native -Wall -mavx2 -flto -fno-trapping-math -fno-math-errno
+
 ```
 
 Testing and Verification
@@ -147,7 +150,106 @@ Benchmark finished
 
 ```
 
+*****************************************************************************************************************************
+```
+./sha1_avx2_test
+--- Running Correctness Tests ---
 
+--- [Section 1: Scalar Implementation] ---
+  Test: Scalar 'abc'
+    Result:   a9993e364706816aba3e25717850c26c9cd0d89d
+    Expected: a9993e364706816aba3e25717850c26c9cd0d89d
+    Status: [PASS]
+
+--- [Section 2: Basic AVX2 Batch] ---
+  Test: AVX2 Lane 0 ('abc...')
+    Result:   a9993e364706816aba3e25717850c26c9cd0d89d
+    Expected: a9993e364706816aba3e25717850c26c9cd0d89d
+    Status: [PASS]
+
+  Test: AVX2 Lane 1 ('...')
+    Result:   da39a3ee5e6b4b0d3255bfef95601890afd80709
+    Expected: da39a3ee5e6b4b0d3255bfef95601890afd80709
+    Status: [PASS]
+
+  Test: AVX2 Lane 2 ('abcdbcdecd...')
+    Result:   84983e441c3bd26ebaae4aa1f95129e5e54670f1
+    Expected: 84983e441c3bd26ebaae4aa1f95129e5e54670f1
+    Status: [PASS]
+
+  Test: AVX2 Lane 3 ('This is a ...')
+    Result:   3532499280b4e2f32f6417e556901a526d69143c
+    Expected: 3532499280b4e2f32f6417e556901a526d69143c
+    Status: [PASS]
+
+  Test: AVX2 Lane 4 ('AVX2 imple...')
+    Result:   0d11fa540ff1aa4796cdd2a91fcb63205bac4cfa
+    Expected: 0d11fa540ff1aa4796cdd2a91fcb63205bac4cfa
+    Status: [PASS]
+
+  Test: AVX2 Lane 5 ('A slightly...')
+    Result:   ef19a54dc106616b6296d175d68a20ef457016d8
+    Expected: ef19a54dc106616b6296d175d68a20ef457016d8
+    Status: [PASS]
+
+  Test: AVX2 Lane 6 ('12345...')
+    Result:   8cb2237d0679ca88db6464eac60da96345513964
+    Expected: 8cb2237d0679ca88db6464eac60da96345513964
+    Status: [PASS]
+
+  Test: AVX2 Lane 7 ('Another te...')
+    Result:   52adbb608a63ba56f12bcd9e56465ee0f6a31780
+    Expected: 52adbb608a63ba56f12bcd9e56465ee0f6a31780
+    Status: [PASS]
+
+--- [Section 3: AVX2 Edge Cases (Padding)] ---
+  Test: AVX2 Edge Case (len=55)
+    Result:   c1c8bbdc22796e28c0e15163d20899b65621d65a
+    Expected: c1c8bbdc22796e28c0e15163d20899b65621d65a
+    Status: [PASS]
+
+  Test: AVX2 Edge Case (len=56)
+    Result:   049adea016c8a8e3b7a9054aeeaa8643453bebd9
+    Expected: 049adea016c8a8e3b7a9054aeeaa8643453bebd9
+    Status: [PASS]
+
+  Test: AVX2 Edge Case (len=63)
+    Result:   3f85dc2655c3426a4937d49028c01a066c535ce0
+    Expected: 3f85dc2655c3426a4937d49028c01a066c535ce0
+    Status: [PASS]
+
+  Test: AVX2 Edge Case (len=64)
+    Result:   7d4f9b6d084894fb8640dc55aab16ad0e021e4c8
+    Expected: 7d4f9b6d084894fb8640dc55aab16ad0e021e4c8
+    Status: [PASS]
+
+  Test: AVX2 Edge Case (len=65)
+    Result:   00c26b97f0dceca9387928bffdc36d303e31d536
+    Expected: 00c26b97f0dceca9387928bffdc36d303e31d536
+    Status: [PASS]
+
+--- [Section 4: AVX2 Multiple Updates (Streaming)] ---
+  Test: AVX2 Streaming Test
+    Result:   913a4ec9683a2a0caf9709fbf64bca37d28f0812
+    Expected: 913a4ec9683a2a0caf9709fbf64bca37d28f0812
+    Status: [PASS]
+
+--- Correctness Tests Finished ---
+Result: All tests passed.
+
+--- Running Throughput Performance Tests ---
+Buffer size: 16 MB/lane, Test duration: ~3 seconds
+
+Testing Scalar throughput...
+  Result: 0.40 GB/s
+
+Testing AVX2 Batch throughput...
+  Result: 1.49 GB/s
+
+--- Performance Summary ---
+Improvement: 3.74x
+
+```
 
 ### Sponsorship
 If this project has been helpful to you, please consider sponsoring. Your support is greatly appreciated. Thank you!
