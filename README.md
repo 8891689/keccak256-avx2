@@ -19,11 +19,11 @@ This is a sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 hashing
 
 ```
 
-gcc -O3 -mavx2 -mfma -march=native sha3_avx2.c sha3_avx2_test.c -o sha3_avx2_test
+gcc -o sha3_avx2_test -O3 -mavx2 -mfma -march=native sha3_avx2.c sha3_avx2_test.c 
 
-gcc -O3 -mavx2 -mfma -march=native keccak_avx2.c keccak_avx2_test.c -o keccak_avx2_test
+gcc -o keccak_avx2_test -O3 -mavx2 -mfma -march=native keccak_avx2.c keccak_avx2_test.c 
 
-gcc -O3 -mavx2 -mfma -march=native keccak_avx_test.c keccak256_avx.c -o keccak_avx_test
+gcc -o keccak256_avx2_test -O3 -mavx2 -mfma -march=native keccak256_avx2_test.c keccak256_avx2.c
 
 gcc -o md5_avx2_test md5_test_avx2.c md5_avx2.c -O3 -march=native -Wall -mavx2 -flto -fno-trapping-math -fno-math-errno
 
