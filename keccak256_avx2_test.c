@@ -1,11 +1,26 @@
-// main.c  gcc -O3 -mavx2 -mfma -march=native keccak_avx_test.c keccak256_avx.c -o keccak_avx_test
-// Author: 8891689
-// https://github.com/8891689
+// keccak256_avx2.c  
+// gcc -O3 -mavx2 -mfma -march=native keccak256_avx2_test.c keccak256_avx2.c -o keccak256_avx2_test
+/* Apache License, Version 2.0
+   Copyright [2025] [8891689]
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   Author: 8891689 (https://github.com/8891689)
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>    
-#include "keccak256_avx.h" 
+#include "keccak256_avx2.h" 
 
 #define NUM_LANES 8
 #define BENCHMARK_DURATION_SECONDS 5.0
