@@ -49,30 +49,94 @@ const int keccakf_piln[24] = {
 };
 
 static void keccakf(uint64_t state[25]) {
-    for (int round = 0; round < 24; round++) {
-        uint64_t bc[5], temp;
-        for (int i = 0; i < 5; i++)
-            bc[i] = state[i] ^ state[i+5] ^ state[i+10] ^ state[i+15] ^ state[i+20];
-        for (int i = 0; i < 5; i++) {
-            temp = bc[(i+4)%5] ^ rotl64(bc[(i+1)%5], 1);
-            for (int j = 0; j < 25; j += 5) state[j+i] ^= temp;
+    
+    uint64_t s00 = state[0],  s01 = state[1],  s02 = state[2],  s03 = state[3],  s04 = state[4];
+    uint64_t s10 = state[5],  s11 = state[6],  s12 = state[7],  s13 = state[8],  s14 = state[9];
+    uint64_t s20 = state[10], s21 = state[11], s22 = state[12], s23 = state[13], s24 = state[14];
+    uint64_t s30 = state[15], s31 = state[16], s32 = state[17], s33 = state[18], s34 = state[19];
+    uint64_t s40 = state[20], s41 = state[21], s42 = state[22], s43 = state[23], s44 = state[24];
+    
+    uint64_t C0, C1, C2, C3, C4, D0, D1, D2, D3, D4;
+
+    for (int round = 0; round < 24; ++round) {
+        // --- Theta step ---
+        C0 = s00 ^ s10 ^ s20 ^ s30 ^ s40;
+        C1 = s01 ^ s11 ^ s21 ^ s31 ^ s41;
+        C2 = s02 ^ s12 ^ s22 ^ s32 ^ s42;
+        C3 = s03 ^ s13 ^ s23 ^ s33 ^ s43;
+        C4 = s04 ^ s14 ^ s24 ^ s34 ^ s44;
+
+        D0 = C4 ^ rotl64(C1, 1);
+        D1 = C0 ^ rotl64(C2, 1);
+        D2 = C1 ^ rotl64(C3, 1);
+        D3 = C2 ^ rotl64(C4, 1);
+        D4 = C3 ^ rotl64(C0, 1);
+
+        s00 ^= D0; s10 ^= D0; s20 ^= D0; s30 ^= D0; s40 ^= D0;
+        s01 ^= D1; s11 ^= D1; s21 ^= D1; s31 ^= D1; s41 ^= D1;
+        s02 ^= D2; s12 ^= D2; s22 ^= D2; s32 ^= D2; s42 ^= D2;
+        s03 ^= D3; s13 ^= D3; s23 ^= D3; s33 ^= D3; s43 ^= D3;
+        s04 ^= D4; s14 ^= D4; s24 ^= D4; s34 ^= D4; s44 ^= D4;
+
+        // --- Rho and Pi steps  ---
+        {
+            uint64_t ns01, ns02, ns03, ns04;
+            uint64_t ns10, ns11, ns12, ns13, ns14;
+            uint64_t ns20, ns21, ns22, ns23, ns24;
+            uint64_t ns30, ns31, ns32, ns33, ns34;
+            uint64_t ns40, ns41, ns42, ns43, ns44;
+            uint64_t current = s01; 
+
+            // keccakf_piln, keccakf_rotc 
+            ns20 = rotl64(current, 1);  current = s20; //piln[0]=10, rotc[0]=1
+            ns12 = rotl64(current, 3);  current = s12; //piln[1]=7,  rotc[1]=3
+            ns21 = rotl64(current, 6);  current = s21; //piln[2]=11, rotc[2]=6
+            ns32 = rotl64(current, 10); current = s32; //piln[3]=17, rotc[3]=10
+            ns33 = rotl64(current, 15); current = s33; //piln[4]=18, rotc[4]=15
+            ns03 = rotl64(current, 21); current = s03; //piln[5]=3,  rotc[5]=21
+            ns10 = rotl64(current, 28); current = s10; //piln[6]=5,  rotc[6]=28
+            ns31 = rotl64(current, 36); current = s31; //piln[7]=16, rotc[7]=36
+            ns13 = rotl64(current, 45); current = s13; //piln[8]=8,  rotc[8]=45
+            ns41 = rotl64(current, 55); current = s41; //piln[9]=21, rotc[9]=55
+            ns44 = rotl64(current, 2);  current = s44; //piln[10]=24,rotc[10]=2
+            ns04 = rotl64(current, 14); current = s04; //piln[11]=4, rotc[11]=14
+            ns30 = rotl64(current, 27); current = s30; //piln[12]=15,rotc[12]=27
+            ns43 = rotl64(current, 41); current = s43; //piln[13]=23,rotc[13]=41
+            ns34 = rotl64(current, 56); current = s34; //piln[14]=19,rotc[14]=56
+            ns23 = rotl64(current, 8);  current = s23; //piln[15]=13,rotc[15]=8
+            ns22 = rotl64(current, 25); current = s22; //piln[16]=12,rotc[16]=25
+            ns02 = rotl64(current, 43); current = s02; //piln[17]=2, rotc[17]=43
+            ns40 = rotl64(current, 62); current = s40; //piln[18]=20,rotc[18]=62
+            ns24 = rotl64(current, 18); current = s24; //piln[19]=14,rotc[19]=18
+            ns42 = rotl64(current, 39); current = s42; //piln[20]=22,rotc[20]=39
+            ns14 = rotl64(current, 61); current = s14; //piln[21]=9, rotc[21]=61
+            ns11 = rotl64(current, 20); current = s11; //piln[22]=6, rotc[22]=20
+            ns01 = rotl64(current, 44);               //piln[23]=1, rotc[23]=44
+
+            // sXX variables 
+            s01=ns01; s02=ns02; s03=ns03; s04=ns04; s10=ns10; s11=ns11; s12=ns12;
+            s13=ns13; s14=ns14; s20=ns20; s21=ns21; s22=ns22; s23=ns23; s24=ns24;
+            s30=ns30; s31=ns31; s32=ns32; s33=ns33; s34=ns34; s40=ns40; s41=ns41;
+            s42=ns42; s43=ns43; s44=ns44;
         }
-        temp = state[1];
-        for (int i = 0; i < 24; i++) {
-            int j = keccakf_piln[i];
-            uint64_t t = state[j];
-            state[j] = rotl64(temp, keccakf_rotc[i]);
-            temp = t;
-        }
-        for (int j = 0; j < 25; j += 5) {
-            uint64_t a[5];
-            for(int i=0; i<5; ++i) a[i] = state[j+i];
-            state[j+0] ^= ~a[1] & a[2]; state[j+1] ^= ~a[2] & a[3];
-            state[j+2] ^= ~a[3] & a[4]; state[j+3] ^= ~a[4] & a[0];
-            state[j+4] ^= ~a[0] & a[1];
-        }
-        state[0] ^= keccakf_rc[round];
+
+        // --- Chi step  ---
+        C0=s00; C1=s01; s00^=~s01&s02; s01^=~s02&s03; s02^=~s03&s04; s03^=~s04&C0; s04^=~C0&C1;
+        C0=s10; C1=s11; s10^=~s11&s12; s11^=~s12&s13; s12^=~s13&s14; s13^=~s14&C0; s14^=~C0&C1;
+        C0=s20; C1=s21; s20^=~s21&s22; s21^=~s22&s23; s22^=~s23&s24; s23^=~s24&C0; s24^=~C0&C1;
+        C0=s30; C1=s31; s30^=~s31&s32; s31^=~s32&s33; s32^=~s33&s34; s33^=~s34&C0; s34^=~C0&C1;
+        C0=s40; C1=s41; s40^=~s41&s42; s41^=~s42&s43; s42^=~s43&s44; s43^=~s44&C0; s44^=~C0&C1;
+
+        // --- Iota step ---
+        s00 ^= keccakf_rc[round];
     }
+    
+    // Write the result back to the status array
+    state[0] = s00;   state[1] = s01;   state[2] = s02;   state[3] = s03;   state[4] = s04;
+    state[5] = s10;   state[6] = s11;   state[7] = s12;   state[8] = s13;   state[9] = s14;
+    state[10] = s20;  state[11] = s21;  state[12] = s22;  state[13] = s23;  state[14] = s24;
+    state[15] = s30;  state[16] = s31;  state[17] = s32;  state[18] = s33;  state[19] = s34;
+    state[20] = s40;  state[21] = s41;  state[22] = s42;  state[23] = s43;  state[24] = s44;
 }
 
 void sha3_init(sha3_ctx *ctx, unsigned int output_length) {
