@@ -1,6 +1,6 @@
-# C/C++ High-performance sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 AVX2 implementations
+# C/C++ High-performance sha2 sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 AVX2 implementations
 
-This is a sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
+This is a sha2 sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 hashing library written in C (compatible with C++), designed for extremely fast computations. It is deeply optimized to take advantage of the AVX2 instruction set in modern CPUs.
 
 ## Core Advantages
 
@@ -11,9 +11,9 @@ This is a sha3,224,256,384,512,Keccak-256,md5,sha1,Keccak224,256,384,512 hashing
 
 ## Applicable Scenarios
 
-* Applications requiring extremely fast SHA3 224, 256, 384, 512, and Keccak-256,md5,sha1 Keccak224,256,384,512 hash calculation speeds.
+* Applications requiring extremely fast SHA2 SHA3 224, 256, 384, 512, and Keccak-256,md5,sha1 Keccak224,256,384,512 hash calculation speeds.
 * Scenarios requiring efficient processing of large numbers of parallel hashing tasks, such as blockchain technology, data verification, and high-performance computing.
-* SHA3 224,256,384,512 and md5,sha1 Keccak224,256,384,512 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
+* SHA2 SHA3 224,256,384,512 and md5,sha1 Keccak224,256,384,512 have built-in basic implementations and AVX2-optimized versions, and function interfaces have been left, which can be linked as needed.
 
 ## Compilation
 
