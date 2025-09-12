@@ -534,3 +534,57 @@ void SHA1BatchFinal(SHA1_CTX_AVX2 *ctx, uint8_t digests[SHA1_AVX2_LANES][20]) {
         SHA1_Final(&s_ctx, digests[i]);
     }
 }
+
+void SHA1BatchOneShot(const uint8_t *data[SHA1_AVX2_LANES], const size_t lens[SHA1_AVX2_LANES], uint8_t digests[SHA1_AVX2_LANES][20]) {
+    uint8_t blocks[SHA1_AVX2_LANES][64] __attribute__((aligned(32)));
+    __m256i current_state[5];
+
+    // Initialize state
+    current_state[0] = _mm256_set1_epi32(0x67452301);
+    current_state[1] = _mm256_set1_epi32(0xefcdab89);
+    current_state[2] = _mm256_set1_epi32(0x98badcfe);
+    current_state[3] = _mm256_set1_epi32(0x10325476);
+    current_state[4] = _mm256_set1_epi32(0xC3D2E1F0);
+
+    // Manually pad each message into a 64-byte block
+    for (int i = 0; i < SHA1_AVX2_LANES; ++i) {
+        memset(blocks[i], 0, 64);
+        memcpy(blocks[i], data[i], lens[i]);
+        blocks[i][lens[i]] = 0x80;
+        
+        // SHA-1 requires the bit length to be in big-endian format
+        uint64_t bit_len = lens[i] * 8;
+        uint8_t *bit_len_bytes = (uint8_t *)&bit_len;
+        for (int j = 0; j < 8; ++j) {
+            blocks[i][56 + j] = bit_len_bytes[7 - j];
+        }
+    }
+    
+    // Perform the transformation
+    Transform_avx2(current_state, (const uint8_t(*)[64])blocks);
+    
+    // Transpose and store the results
+    uint32_t transposed_data[5][SHA1_AVX2_LANES] __attribute__((aligned(32)));
+    _mm256_store_si256((__m256i*)transposed_data[0], current_state[0]);
+    _mm256_store_si256((__m256i*)transposed_data[1], current_state[1]);
+    _mm256_store_si256((__m256i*)transposed_data[2], current_state[2]);
+    _mm256_store_si256((__m256i*)transposed_data[3], current_state[3]);
+    _mm256_store_si256((__m256i*)transposed_data[4], current_state[4]);
+
+    // Reconstruct the final digests and convert to big-endian
+    for (int i = 0; i < SHA1_AVX2_LANES; i++) {
+        uint32_t final_state[5] = {
+            transposed_data[0][i],
+            transposed_data[1][i],
+            transposed_data[2][i],
+            transposed_data[3][i],
+            transposed_data[4][i]
+        };
+        for (int j = 0; j < 5; j++) {
+            digests[i][j*4 + 0] = (uint8_t)((final_state[j] >> 24) & 0xFF);
+            digests[i][j*4 + 1] = (uint8_t)((final_state[j] >> 16) & 0xFF);
+            digests[i][j*4 + 2] = (uint8_t)((final_state[j] >> 8) & 0xFF);
+            digests[i][j*4 + 3] = (uint8_t)(final_state[j] & 0xFF);
+        }
+    }
+}

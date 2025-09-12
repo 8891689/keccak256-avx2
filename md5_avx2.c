@@ -523,3 +523,53 @@ void MD5BatchFinal(MD5_CTX_AVX2 *ctx, uint8_t digests[MD5_AVX2_LANES][16]) {
         MD5Final(&s_ctx, digests[i]);
     }
 }
+
+void MD5BatchOneShot(const uint8_t *data[MD5_AVX2_LANES], const size_t lens[MD5_AVX2_LANES], uint8_t digests[MD5_AVX2_LANES][16]) {
+    uint8_t blocks[MD5_AVX2_LANES][64] __attribute__((aligned(32)));
+    __m256i current_state[4];
+
+    // Initialize state
+    current_state[0] = _mm256_set1_epi32(0x67452301);
+    current_state[1] = _mm256_set1_epi32(0xefcdab89);
+    current_state[2] = _mm256_set1_epi32(0x98badcfe);
+    current_state[3] = _mm256_set1_epi32(0x10325476);
+
+    // Manually pad each message into a 64-byte block
+    for (int i = 0; i < MD5_AVX2_LANES; ++i) {
+        // Since we are reusing this for multiple batches, ensure blocks are clean.
+        memset(blocks[i], 0, 64);
+        memcpy(blocks[i], data[i], lens[i]);
+        blocks[i][lens[i]] = 0x80;
+        
+        uint64_t bit_len = lens[i] * 8;
+        memcpy(&blocks[i][56], &bit_len, 8);
+    }
+    
+    // Perform the transformation
+    Transform_avx2(current_state, (const uint8_t(*)[64])blocks);
+    
+    // --- CORRECTED TRANSPOSITION LOGIC ---
+
+    // Define storage as 4 rows (A,B,C,D), each with 8 columns (for 8 lanes)
+    uint32_t transposed_data[4][MD5_AVX2_LANES] __attribute__((aligned(32)));
+
+    // Store all A states (A0..A7) in the first row
+    _mm256_store_si256((__m256i*)transposed_data[0], current_state[0]);
+    // Store all B states (B0..B7) in the second row
+    _mm256_store_si256((__m256i*)transposed_data[1], current_state[1]);
+    // Store all C states (C0..C7) in the third row
+    _mm256_store_si256((__m256i*)transposed_data[2], current_state[2]);
+    // Store all D states (D0..D7) in the fourth row
+    _mm256_store_si256((__m256i*)transposed_data[3], current_state[3]);
+
+    // Reconstruct the final digests by picking one element from each row
+    for (int i = 0; i < MD5_AVX2_LANES; i++) {
+        uint32_t final_state[4] = {
+            transposed_data[0][i], // Get Ai
+            transposed_data[1][i], // Get Bi
+            transposed_data[2][i], // Get Ci
+            transposed_data[3][i]  // Get Di
+        };
+        memcpy(digests[i], final_state, 16);
+    }
+}

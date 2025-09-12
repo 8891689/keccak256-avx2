@@ -56,6 +56,15 @@ void SHA1BatchInit(SHA1_CTX_AVX2 *ctx);
 void SHA1BatchUpdate(SHA1_CTX_AVX2 *ctx, const uint8_t *data[], const size_t lens[]);
 void SHA1BatchFinal(SHA1_CTX_AVX2 *ctx, uint8_t digests[SHA1_AVX2_LANES][20]);
 
+/**
+ * @brief A specialized function to compute SHA-1 for a batch of short messages (< 56 bytes) in one shot.
+ *        This function is highly optimized for high-throughput, small-message hashing.
+ * @param data      Array of pointers to the input messages.
+ * @param lens      Array of lengths for each message. All lengths must be < 56.
+ * @param digests   A 2D array to store the resulting 20-byte SHA-1 digests.
+ */
+void SHA1BatchOneShot(const uint8_t *data[SHA1_AVX2_LANES], const size_t lens[SHA1_AVX2_LANES], uint8_t digests[SHA1_AVX2_LANES][20]);
+
 #ifdef __cplusplus
 }
 #endif

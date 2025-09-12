@@ -94,6 +94,15 @@ void MD5BatchUpdate(MD5_CTX_AVX2 *ctx, const uint8_t *data[], const size_t lens[
  */
 void MD5BatchFinal(MD5_CTX_AVX2 *ctx, uint8_t digests[MD5_AVX2_LANES][16]);
 
+/**
+ * @brief A specialized function to compute MD5 for a batch of short messages (< 56 bytes) in one shot.
+ *        This function is highly optimized for high-throughput, small-message hashing.
+ * @param data      Array of pointers to the input messages.
+ * @param lens      Array of lengths for each message. All lengths must be < 56.
+ * @param digests   A 2D array to store the resulting 16-byte MD5 digests.
+ */
+void MD5BatchOneShot(const uint8_t *data[MD5_AVX2_LANES], const size_t lens[MD5_AVX2_LANES], uint8_t digests[MD5_AVX2_LANES][16]);
+
 #ifdef __cplusplus
 }
 #endif
